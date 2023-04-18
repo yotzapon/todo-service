@@ -18,8 +18,9 @@ generate_mock:
 	go run github.com/golang/mock/mockgen -destination=./mocks/mock_service_auth.go -package=mocks github.com/yotzapon/todo-service/internal/services AuthServiceInterface
 	go run github.com/golang/mock/mockgen -destination=./mocks/mock_service_todo.go -package=mocks github.com/yotzapon/todo-service/internal/services TodoServiceInterface
 
-e2e:
-	sh ./tests/automated/run.sh
-
 commit_check:
 	pre-commit run
+
+run_local: generate_mock _bindata
+	go run ./cmd/cli/main.go db drop && go run ./cmd/cli/main.go db migrate
+	go run main.go
