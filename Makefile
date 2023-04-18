@@ -23,4 +23,8 @@ commit_check:
 
 run_local: generate_mock _bindata
 	go run ./cmd/cli/main.go db drop && go run ./cmd/cli/main.go db migrate
+	go test -tags integration_test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 	go run main.go
+
+run_test: generate_mock _bindata
+	go test -tags integration_test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
