@@ -1,0 +1,519 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a Todo API.",
+        "title": "Todo APIs",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8082",
+    "basePath": "/v1",
+    "paths": {
+        "/livez": {
+            "get": {
+                "description": "This API is used to check the liveness of an application or service.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "HealthCheck"
+                ],
+                "summary": "This API is used to check the liveness of an application or service.",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "This API is used to authenticate a user and generate a unique token that can be used for accessing other APIs within the system.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "API is used to authenticate a user.",
+                "parameters": [
+                    {
+                        "description": "Login body request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.RequestAuthModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/auth.ResponseAuthModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/helpers.ResponseError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/helpers.ResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/readyz": {
+            "get": {
+                "description": "This API is used to check the readiness of an application or service.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "HealthCheck"
+                ],
+                "summary": "This API is used to check the readiness of an application or service.",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/todos": {
+            "get": {
+                "description": "The API should allow the user to input the unique ID of the Todo item and return its details, including its title, description, and any other relevant information.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todo"
+                ],
+                "summary": "This action involves retrieving a specific Todo item from the system.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Todo ID can input more than one by use , (comma) separate",
+                        "name": "ids",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter the result by 'true' or 'false'",
+                        "name": "isComplete",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Order the Todo by created dated the results by 'desc' or 'asc'",
+                        "name": "orderCreated",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Order the Todo by updated dated the results by 'desc' or 'asc'",
+                        "name": "orderUpdated",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Limit the result",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/helpers.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/todo.ResponseTodoModel"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/helpers.ResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/helpers.ResponseError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "The API should allow the user to input the unique ID of the Todo item and the updated details, such as its title, description, and any other relevant information.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todo"
+                ],
+                "summary": "This action involves updating an existing Todo item in the system.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Todo ID needs to update",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "description": "Update Todo body request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/todo.RequestTodoModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/helpers.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/todo.ResponseTodoModel"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/helpers.ResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/helpers.ResponseError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "The API should allow the user to input the details of the new Todo item, including its title, description, and any other relevant information. Upon successful creation, the API should return the newly created Todo item's unique ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todo"
+                ],
+                "summary": "This action involves creating a new Todo item in the system",
+                "parameters": [
+                    {
+                        "description": "Create Todo body request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/todo.RequestTodoModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/helpers.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/todo.ResponseTodoModel"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/helpers.ResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/helpers.ResponseError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "The API should allow the user to input the unique ID of the Todo item and delete it from the database.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todo"
+                ],
+                "summary": "This action involves deleting a specific Todo item from the system.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Todo ID needs to delete",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/helpers.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/todo.ResponseTodoModel"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/helpers.ResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/helpers.ResponseError"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "The API should allow the user to input the unique ID of the Todo item and update its \"completed\" status to \"true\". Upon successful completion, the API should return the updated Todo item's unique ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todo"
+                ],
+                "summary": "This action involves marking a specific Todo item as complete in the system.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Todo ID need to mark as complete",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/helpers.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/todo.ResponseTodoModel"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/helpers.ResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/helpers.ResponseError"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "auth.RequestAuthModel": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.ResponseAuthModel": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "helpers.Response": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "responseCode": {
+                    "type": "integer",
+                    "example": 200
+                },
+                "responseDescription": {
+                    "type": "string",
+                    "example": "OK"
+                }
+            }
+        },
+        "helpers.ResponseError": {
+            "type": "object",
+            "properties": {
+                "responseCode": {
+                    "type": "integer",
+                    "example": 4001
+                },
+                "responseDescription": {
+                    "type": "string",
+                    "example": "INVALID_BODY_OR_PARAM_REQUEST"
+                }
+            }
+        },
+        "todo.RequestTodoModel": {
+            "type": "object",
+            "required": [
+                "description",
+                "title"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "todo.ResponseTodoModel": {
+            "type": "object",
+            "properties": {
+                "created": {
+                    "type": "string",
+                    "example": "2023-04-17T15:45:39+07:00"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "buy the bag"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "todos_01GY7687DW357TEAQR5TA23VEA"
+                },
+                "isCompleted": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "title": {
+                    "type": "string",
+                    "example": "home"
+                },
+                "updated": {
+                    "type": "string",
+                    "example": "2023-04-17T15:45:39+07:00"
+                }
+            }
+        }
+    }
+}

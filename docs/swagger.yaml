@@ -1,0 +1,343 @@
+basePath: /v1
+definitions:
+  auth.RequestAuthModel:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  auth.ResponseAuthModel:
+    properties:
+      access_token:
+        type: string
+    type: object
+  helpers.Response:
+    properties:
+      data: {}
+      responseCode:
+        example: 200
+        type: integer
+      responseDescription:
+        example: OK
+        type: string
+    type: object
+  helpers.ResponseError:
+    properties:
+      responseCode:
+        example: 4001
+        type: integer
+      responseDescription:
+        example: INVALID_BODY_OR_PARAM_REQUEST
+        type: string
+    type: object
+  todo.RequestTodoModel:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+    required:
+    - description
+    - title
+    type: object
+  todo.ResponseTodoModel:
+    properties:
+      created:
+        example: "2023-04-17T15:45:39+07:00"
+        type: string
+      description:
+        example: buy the bag
+        type: string
+      id:
+        example: todos_01GY7687DW357TEAQR5TA23VEA
+        type: string
+      isCompleted:
+        example: false
+        type: boolean
+      title:
+        example: home
+        type: string
+      updated:
+        example: "2023-04-17T15:45:39+07:00"
+        type: string
+    type: object
+host: localhost:8082
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a Todo API.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Todo APIs
+  version: "1.0"
+paths:
+  /livez:
+    get:
+      consumes:
+      - application/json
+      description: This API is used to check the liveness of an application or service.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: This API is used to check the liveness of an application or service.
+      tags:
+      - HealthCheck
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: This API is used to authenticate a user and generate a unique token
+        that can be used for accessing other APIs within the system.
+      parameters:
+      - description: Login body request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RequestAuthModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.ResponseAuthModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helpers.ResponseError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/helpers.ResponseError'
+      summary: API is used to authenticate a user.
+      tags:
+      - Auth
+  /readyz:
+    get:
+      consumes:
+      - application/json
+      description: This API is used to check the readiness of an application or service.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: This API is used to check the readiness of an application or service.
+      tags:
+      - HealthCheck
+  /v1/todos:
+    delete:
+      consumes:
+      - application/json
+      description: The API should allow the user to input the unique ID of the Todo
+        item and delete it from the database.
+      parameters:
+      - description: Todo ID needs to delete
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/helpers.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/todo.ResponseTodoModel'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helpers.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/helpers.ResponseError'
+      summary: This action involves deleting a specific Todo item from the system.
+      tags:
+      - Todo
+    get:
+      consumes:
+      - application/json
+      description: The API should allow the user to input the unique ID of the Todo
+        item and return its details, including its title, description, and any other
+        relevant information.
+      parameters:
+      - description: Todo ID can input more than one by use , (comma) separate
+        in: query
+        name: ids
+        type: string
+      - description: Filter the result by 'true' or 'false'
+        in: query
+        name: isComplete
+        type: string
+      - description: Order the Todo by created dated the results by 'desc' or 'asc'
+        in: query
+        name: orderCreated
+        type: string
+      - description: Order the Todo by updated dated the results by 'desc' or 'asc'
+        in: query
+        name: orderUpdated
+        type: string
+      - description: Limit the result
+        in: query
+        name: limit
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/helpers.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/todo.ResponseTodoModel'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helpers.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/helpers.ResponseError'
+      summary: This action involves retrieving a specific Todo item from the system.
+      tags:
+      - Todo
+    patch:
+      consumes:
+      - application/json
+      description: The API should allow the user to input the unique ID of the Todo
+        item and update its "completed" status to "true". Upon successful completion,
+        the API should return the updated Todo item's unique ID.
+      parameters:
+      - description: Todo ID need to mark as complete
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/helpers.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/todo.ResponseTodoModel'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helpers.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/helpers.ResponseError'
+      summary: This action involves marking a specific Todo item as complete in the
+        system.
+      tags:
+      - Todo
+    post:
+      consumes:
+      - application/json
+      description: The API should allow the user to input the details of the new Todo
+        item, including its title, description, and any other relevant information.
+        Upon successful creation, the API should return the newly created Todo item's
+        unique ID.
+      parameters:
+      - description: Create Todo body request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/todo.RequestTodoModel'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/helpers.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/todo.ResponseTodoModel'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helpers.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/helpers.ResponseError'
+      summary: This action involves creating a new Todo item in the system
+      tags:
+      - Todo
+    put:
+      consumes:
+      - application/json
+      description: The API should allow the user to input the unique ID of the Todo
+        item and the updated details, such as its title, description, and any other
+        relevant information.
+      parameters:
+      - description: Todo ID needs to update
+        in: query
+        name: id
+        type: string
+      - description: Update Todo body request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/todo.RequestTodoModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/helpers.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/todo.ResponseTodoModel'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helpers.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/helpers.ResponseError'
+      summary: This action involves updating an existing Todo item in the system.
+      tags:
+      - Todo
+swagger: "2.0"

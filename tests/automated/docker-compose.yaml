@@ -1,0 +1,45 @@
+version: "3.0"
+services:
+  todo-db:
+    image: mysql:8
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_USER=dbuser
+      - MYSQL_PASSWORD=dbpass
+      - MYSQL_DATABASE=my_db
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
+  todo-migration:
+    container_name: todo-migration
+    image: "todo-service:latest"
+    environment:
+      - CONFIG__DB__HOST=todo-db
+      - CONFIG__DB__USER=dbuser
+      - CONFIG__DB__PASSWORD=dbpass
+      - CONFIG__DB__NAME=my_db
+    command: ./mtl db migrate --no-lock
+    restart: on-failure
+    depends_on:
+      - "todo-db"
+  todo-service:
+    image: "todo-service:latest"
+    ports:
+      - "8082:8082"
+    environment:
+      - CONFIG__DB__HOST=todo-db
+      - CONFIG__DB__USER=dbuser
+      - CONFIG__DB__PASSWORD=dbpass
+      - CONFIG__DB__NAME=my_db
+      - CONFIG__DB__PORT=3306
+      - CONFIG__APP_CONFIG__PORT=8082
+    restart: "on-failure"
+    depends_on:
+      - "todo-migration"
+  sonarqube:
+    image: sonarqube:latest
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_HOST_URL=http://todo-service:8082
+    depends_on:
+      - "todo-service"

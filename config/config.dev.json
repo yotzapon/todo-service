@@ -1,0 +1,11 @@
+{
+  "db": {
+    "host": "localhost",
+    "user": "dbuser",
+    "password": "dbpass",
+    "name": "my_db"
+  },
+  "appConfig": {
+    "port": 8082
+  }
+}
